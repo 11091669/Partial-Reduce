@@ -116,10 +116,11 @@ class Worker(Process):
             self.model.train()
             for batch_idx, (inputs, targets) in enumerate(self._dataloader):
                 #训练流程
+                # inputs = inputs.view(-1, 28, 28)
                 inputs = inputs.cuda()
                 targets = targets.cuda()
                 self._optimizer.zero_grad()
-                # inputs = inputs.view(-1, 28, 28)
+                
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, targets)
                 loss.backward()
@@ -151,9 +152,10 @@ class Worker(Process):
         correct = 0
         total = 0
         for batch_idx, (inputs, targets) in enumerate(self._testloader):
+            # inputs = inputs.view(-1, 28, 28)
             inputs = inputs.cuda()
             targets = targets.cuda()
-            # inputs = inputs.view(-1, 28, 28)
+            
             outputs = self.model(inputs)
             loss = self.criterion(outputs, targets)
             _, predicted = outputs.max(1)
@@ -161,9 +163,9 @@ class Worker(Process):
             correct += predicted.eq(targets).sum().item()
         acc = 100. * correct / total
         self._acc_list[self._reduce_model.ID] = acc
-        with open('record_acc%d.txt'%(self._ID), 'a') as f:
-            f.write('%f\n'%(acc))
-        f.close()
+        # with open('record_acc%d.txt'%(self._ID), 'a') as f:
+        #     f.write('%f\n'%(acc))
+        # f.close()
         # self.scheduler.step()
 
     @property
